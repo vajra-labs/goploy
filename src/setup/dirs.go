@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"dokpanel/src/docker"
+	"dokpanel/src/lib/docker"
 )
 
 // Setup all necessary directories.

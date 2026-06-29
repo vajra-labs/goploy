@@ -41,7 +41,7 @@ dokpanel.sqlit
 
 # Editor/IDE
 .idea/
-.vscode/
+# .vscode/
 *.log
 
 # exe file

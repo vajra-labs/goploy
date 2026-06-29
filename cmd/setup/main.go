@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"dokpanel/src/docker"
+	"dokpanel/src/lib/docker"
 	_ "dokpanel/src/logger"
 	"dokpanel/src/setup"
 )

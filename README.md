@@ -34,6 +34,7 @@ dokpanel is a free, self-hostable deployment platform that simplifies applicatio
 - [Docker](https://www.docker.com/products/docker-desktop)
 - [Bun](https://bun.com/) (for building the frontend)
 - [Taskfile](https://taskfile.dev/docs/installation) (cross-platform build tool)
+- [Atlas](https://atlasgo.io/getting-started#step-1-install-atlas) (optional, for schema diffing)
 
 ### Installation
 
@@ -78,8 +79,9 @@ task              # Show all available commands
 task setup        # One-time dev setup (Swarm, Traefik, etc.)
 task teardown     # Revert dev setup (remove Traefik, etc.)
 task dev          # Start dev server with live reload (Air)
-task build        # Build production binary (includes web:build)
-task start        # Run production binary
+task build          # Build production binary (includes web:build)
+task server:build   # Build Go server binary only (skips web:build)
+task start          # Run production binary
 task code:test    # Run all tests
 task code:format  # Format Go source code
 task mod:deps     # Download Go dependencies
@@ -99,6 +101,9 @@ task migrate:up      # Run pending migrations
 task migrate:down    # Rollback last migration
 task migrate:status  # Show migration status
 task migrate:reset   # Rollback all migrations
+
+# Schema management (atlas + goose)
+task atlas:diff NAME=<label>  # Diff schema and generate Goose migration file
 
 # Code generation (sqlc)
 task sqlc         # Generate type-safe Go from SQL
@@ -155,7 +160,12 @@ web/               # React dashboard (TanStack Router + Tailwind v4)
 └── embed.go       # Embeds dist/ into Go binary
 
 tests/             # Integration tests
-sqldb/             # SQL migrations & sqlc config
+sqldb/             # SQL schema, migrations & sqlc config
+├── migrate/       # Goose migration files (embedded in binary)
+├── schema/        # Atlas schema source files
+├── queries/       # sqlc SQL queries
+├── embed.go       # Embeds migrate/ into Go binary
+└── tools/         # Atlas post-processor (trigger patch)
 ```
 
 ### `web/` — Frontend Dashboard

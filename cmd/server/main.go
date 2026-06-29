@@ -10,10 +10,11 @@ import (
 	"syscall"
 	"time"
 
+	"dokpanel/sqldb"
 	"dokpanel/src"
 	"dokpanel/src/conf"
 	"dokpanel/src/db"
-	"dokpanel/src/docker"
+	"dokpanel/src/lib/docker"
 	_ "dokpanel/src/logger"
 
 	"github.com/gofiber/fiber/v3"
@@ -21,6 +22,7 @@ import (
 
 func main() {
 	docker.Init()
+	sqldb.Migrate(db.Pool)
 
 	app := src.App()
 	uri := fmt.Sprintf("%s:%d", conf.Env.HOST, conf.Env.PORT)

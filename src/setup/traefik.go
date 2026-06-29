@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"dokpanel/src/conf"
-	"dokpanel/src/docker"
+	"dokpanel/src/lib/docker"
 
 	"github.com/moby/moby/api/types/container"
 	"github.com/moby/moby/api/types/network"

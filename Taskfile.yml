@@ -12,7 +12,7 @@ vars:
   MAIN_PATH: ./cmd/server/main.go
   BINARY_NAME: ./tmp/main.exe
   # Goose Variables
-  GOOSE_DIR: ./sqldb/schema
+  GOOSE_DIR: ./sqldb/migrate
   GOOSE_DRIVER: sqlite3
 
 tasks:
@@ -47,9 +47,14 @@ tasks:
   build:
     desc: Build optimized binary for current OS
     cmds:
+      - task: web:build
+      - task: server:build
+
+  server:build:
+    desc: Build Go server binary only.
+    cmds:
       - task: mod:tidy
       - task: mod:clean
-      - task: web:build
       - go build -ldflags="-w -s -X dokpanel/src/conf.VERSION={{.VERSION}}" -trimpath -o {{.BINARY_NAME}} {{.MAIN_PATH}}
       - ls -lh {{.BINARY_NAME}}
 
@@ -89,6 +94,19 @@ tasks:
   mod:clean:
     desc: Remove build artifacts and temporary files
     cmd: rm -rf bin/ tmp/ coverage.out coverage.html
+
+  # Atlas Schema Management
+  atlas:diff:
+    desc: "Generate Goose migration file (usage: task atlas:diff NAME=add_users)"
+    preconditions:
+      - sh: command -v atlas
+        msg: "Atlas not found. Install: https://atlasgo.io/getting-started#step-1-install-atlas"
+      - sh: '[ -n "{{.NAME}}" ]'
+        msg: "NAME is required. Usage: task atlas:diff NAME=add_users"
+    cmds:
+      - atlas migrate diff {{.NAME}} --env local --config file://sqldb/atlas.hcl
+      - go run ./sqldb/tools/script.go
+      - atlas migrate hash --env local --config file://sqldb/atlas.hcl
 
   # Migrations (goose)
   migrate:up:

@@ -19,14 +19,17 @@ func init() {
 		log.Fatal().Err(err).Msg("Failed to open DB")
 	}
 	// SQLite settings
+	if _, err := con.Exec("PRAGMA foreign_keys=ON;"); err != nil {
+		log.Fatal().Err(err).Msg("Failed to enable foreign keys")
+	}
 	if _, err := con.Exec("PRAGMA journal_mode=WAL;"); err != nil {
 		log.Fatal().Err(err).Msg("Failed to set WAL mode")
 	}
+	if _, err := con.Exec("PRAGMA synchronous=NORMAL;"); err != nil {
+		log.Fatal().Err(err).Msg("Failed to set synchronous mode")
+	}
 	if _, err := con.Exec("PRAGMA busy_timeout=5000;"); err != nil {
 		log.Fatal().Err(err).Msg("Failed to set busy timeout")
-	}
-	if _, err := con.Exec("PRAGMA foreign_keys=ON;"); err != nil {
-		log.Fatal().Err(err).Msg("Failed to enable foreign keys")
 	}
 	// Verify connection
 	if err = con.Ping(); err != nil {
