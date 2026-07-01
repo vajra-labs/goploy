@@ -1,3 +1,0 @@
--- atlas:import group.sql
--- atlas:import users.sql
--- atlas:import metrics.sql

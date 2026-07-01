@@ -1,0 +1,12 @@
+-- atlas:import 002_group.sql
+-- atlas:import 003_users.sql
+-- atlas:import 004_organization.sql
+-- atlas:import 005_projects.sql
+-- atlas:import 006_database.sql
+-- atlas:import 007_metrics.sql
+-- atlas:import 008_ssh_keys.sql
+-- atlas:import 009_registries.sql
+-- atlas:import 010_environments.sql
+-- atlas:import 011_servers.sql
+-- atlas:import 012_git_provides.sql
+-- atlas:import 013_applications.sql
