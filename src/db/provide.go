@@ -42,10 +42,12 @@ func providerPool(lc fx.Lifecycle, cfg *conf.Config) *sql.DB {
 			pool.SetMaxOpenConns(10)
 			pool.SetMaxIdleConns(5)
 			// Run embedded migrations
-			sqldb.Migrate(pool)
+			sqldb.Migrate(pool, cfg)
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
+			log.Info().Msg("Closing database connection")
+			// Close the connection pool
 			return pool.Close()
 		},
 	})

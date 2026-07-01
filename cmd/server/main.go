@@ -16,9 +16,12 @@ import (
 	"dokpanel/web"
 
 	"github.com/gofiber/fiber/v3"
+	zerolog "github.com/rs/zerolog/log"
 	"go.uber.org/fx"
+	"go.uber.org/fx/fxevent"
 )
 
+// StartServer starts the Fiber server and manages its lifecycle with fx.
 func StartServer(lc fx.Lifecycle, app *fiber.App, cfg *conf.Config) {
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
@@ -27,24 +30,32 @@ func StartServer(lc fx.Lifecycle, app *fiber.App, cfg *conf.Config) {
 				if err := app.Listen(uri, fiber.ListenConfig{
 					EnablePrefork: false,
 				}); err != nil && !errors.Is(err, net.ErrClosed) {
-					log.Panic(err)
+					zerolog.Panic().Err(err).Msg("Failed to start server")
 				}
 			}()
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			fmt.Println("Gracefully shutting down...")
+			zerolog.Info().Msg("Gracefully shutting down...")
 			if err := app.ShutdownWithTimeout(5 * time.Second); err != nil {
-				log.Printf("Shutdown error: %v\n", err)
+				zerolog.Error().Err(err).Msg("Shutdown error")
 			}
 			return nil
 		},
 	})
 }
 
+// FxLogger is a helper function to provide a logger for fx.
+var FxLogger = fx.WithLogger(func(cfg *conf.Config) fxevent.Logger {
+	if cfg.IS_PROD {
+		return fxevent.NopLogger
+	}
+	return &fxevent.ConsoleLogger{W: log.Writer()}
+})
+
 func main() {
 	app := fx.New(
-		fx.NopLogger,
+		FxLogger,
 		conf.Module,
 		logger.Module,
 		db.Module,

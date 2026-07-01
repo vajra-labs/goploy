@@ -16,7 +16,7 @@ const (
 	LOG_PATH  = "./logs/server.log"
 )
 
-func providerLogger(cfg *conf.Config) {
+func configLogger(cfg *conf.Config) {
 	var writers []io.Writer
 	// Dev: Colored console only
 	console := zerolog.ConsoleWriter{
@@ -40,5 +40,4 @@ func providerLogger(cfg *conf.Config) {
 	log.Logger = zerolog.New(multi).With().Timestamp().Caller().Logger()
 	zerolog.TimeFieldFormat = TIMESTAMP
 	zerolog.SetGlobalLevel(zerolog.DebugLevel)
-
 }

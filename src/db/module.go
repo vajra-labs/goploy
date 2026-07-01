@@ -1,14 +1,15 @@
 package db
 
 import (
-	"dokpanel/src/db/repos"
+	"database/sql"
 
 	"go.uber.org/fx"
 )
 
+// Module is the fx module for database dependencies.
 var Module = fx.Module("database",
 	fx.Provide(providerPool, provideQueries),
-	// Force eager initialization — ensures OnStart lifecycle hook always runs
-	// even when no handler currently injects *repos.Queries
-	fx.Invoke(func(_ *repos.Queries) {}),
+	// Force database pool initialization to register its lifecycle hooks
+	// (like pragmas, ping, and migrations) even if no other module injects it.
+	fx.Invoke(func(_ *sql.DB) {}),
 )
