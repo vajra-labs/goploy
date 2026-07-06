@@ -55,7 +55,3 @@ func provideClient(lc fx.Lifecycle, cfg *conf.Config) *client.Client {
 
 	return c
 }
-
-func providePaths(cfg *conf.Config) *AppPaths {
-	return NewPaths(cfg)
-}

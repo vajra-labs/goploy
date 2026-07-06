@@ -1,23 +1,23 @@
-CREATE TABLE "groups" (
-	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
-	"name" TEXT NOT NULL UNIQUE,
+CREATE TABLE groups (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	name TEXT NOT NULL UNIQUE,
 	-- Unique group name (e.g. 'admin', 'devops')
-	"created_at" INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
-	"updated_at" INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL
+	created_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
+	updated_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL
 ) STRICT;
 
-CREATE TABLE "policy" (
-	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
-	"action" TEXT NOT NULL UNIQUE,
+CREATE TABLE policy (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	action TEXT NOT NULL UNIQUE,
 	-- Unique action name (e.g. 'read:containers', 'write:users')
-	"created_at" INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL
+	created_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL
 ) STRICT;
 
-CREATE TABLE "group_policy" (
-	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
-	"group_id" INTEGER NOT NULL REFERENCES "groups"("id"),
-	"policy_id" INTEGER NOT NULL REFERENCES "policy"("id"),
-	"created_at" INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL
+CREATE TABLE group_policy (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	group_id INTEGER NOT NULL REFERENCES groups(id),
+	policy_id INTEGER NOT NULL REFERENCES policy(id),
+	created_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL
 ) STRICT;
 
 -- Trigger Function

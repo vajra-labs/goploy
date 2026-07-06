@@ -22,7 +22,7 @@ type AppPaths struct {
 }
 
 // NewPaths builds AppPaths from config.
-func NewPaths(cfg *conf.Config) *AppPaths {
+func providePaths(cfg *conf.Config) *AppPaths {
 	base := "./.docker" // dev default
 	if cfg.IS_PROD {
 		base = "/etc/dokpanel"

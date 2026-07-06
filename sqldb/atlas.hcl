@@ -1,5 +1,5 @@
 env "local" {
-  src = "file://sqldb/schema/001_index.sql"
+  src = "file://sqldb/schema/001_schema.sql"
   url = "sqlite://sqldb/db.sqlite3"
   dev = "sqlite://dev?mode=memory"
 

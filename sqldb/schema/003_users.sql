@@ -1,54 +1,43 @@
-CREATE TABLE "users" (
-	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
-	"email" TEXT UNIQUE,
-	"last_name" TEXT,
-	"first_name" TEXT,
-	"avatar" TEXT NOT NULL,
+CREATE TABLE users (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	email TEXT UNIQUE,
+	last_name TEXT,
+	first_name TEXT,
+	avatar TEXT NOT NULL,
 	-- User role: OWNER | ADMIN | MEMBER
-	"role" TEXT DEFAULT 'OWNER',
-	"about_me" TEXT,
-	"password" TEXT NOT NULL,
-	"is_email_verify" INTEGER DEFAULT 0,
-	"email_verify_at" INTEGER,
-	"two_factor_enable" INTEGER DEFAULT 0,
-	"is_registered" INTEGER DEFAULT 0 NOT NULL,
-	"added_by" INTEGER DEFAULT NULL REFERENCES "users"("id"),
-	"group_id" INTEGER NOT NULL REFERENCES "groups"("id"),
-	"created_at" INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
-	"updated_at" INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
-	CONSTRAINT "role_check" CHECK (role IN ('OWNER', 'ADMIN', 'MEMBER'))
+	role TEXT DEFAULT 'OWNER',
+	about_me TEXT,
+	password TEXT NOT NULL,
+	is_email_verify INTEGER DEFAULT 0,
+	email_verify_at INTEGER,
+	two_factor_enable INTEGER DEFAULT 0,
+	is_registered INTEGER DEFAULT 0 NOT NULL,
+	added_by INTEGER DEFAULT NULL REFERENCES users(id),
+	group_id INTEGER NOT NULL REFERENCES groups(id),
+	created_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
+	updated_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
+	CONSTRAINT role_check CHECK (role IN ('OWNER', 'ADMIN', 'MEMBER'))
 ) STRICT;
 
-CREATE TABLE "two_factor" (
-	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
-	"secret" TEXT NOT NULL,
-	"backup_codes" TEXT NOT NULL,
-	"user_id" INTEGER NOT NULL REFERENCES "users"("id") ON DELETE CASCADE
+CREATE TABLE two_factor (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	secret TEXT NOT NULL,
+	backup_codes TEXT NOT NULL,
+	user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
 ) STRICT;
 
-CREATE TABLE "jwt_tokens" (
-	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
-	"jti" TEXT NOT NULL,
+CREATE TABLE jwt_tokens (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	jti TEXT NOT NULL,
 	-- Role at time of token issuance: OWNER | ADMIN | MEMBER
-	"role" TEXT NOT NULL,
-	"user_id" INTEGER NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
-	"is_blacklist" INTEGER DEFAULT 0,
-	"blacklist_at" INTEGER,
-	"expired_at" INTEGER,
-	"created_at" INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
-	"updated_at" INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
-	CONSTRAINT "role_check" CHECK (role IN ('OWNER', 'ADMIN', 'MEMBER'))
-) STRICT;
-
-CREATE TABLE "activity_logs" (
-	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
-	"user_id" INTEGER NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
-	-- Activity type: LOGIN | LOGOUT | REGISTER
-	"activity" TEXT NOT NULL,
-	"source" TEXT NOT NULL,
-	"client_ip" TEXT NOT NULL,
-	"created_at" INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
-	CONSTRAINT "activity_check" CHECK (activity IN ('LOGIN', 'LOGOUT', 'REGISTER'))
+	role TEXT NOT NULL,
+	user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+	is_blacklist INTEGER DEFAULT 0,
+	blacklist_at INTEGER,
+	expired_at INTEGER,
+	created_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
+	updated_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
+	CONSTRAINT role_check CHECK (role IN ('OWNER', 'ADMIN', 'MEMBER'))
 ) STRICT;
 
 -- Trigger Function

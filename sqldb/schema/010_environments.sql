@@ -1,14 +1,13 @@
 -- Environments group related services inside a project
-CREATE TABLE "environments" (
-	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
-	"name" TEXT NOT NULL,
-	"description" TEXT,
-	-- Shared env vars for all services in this environment
-	"env" TEXT NOT NULL DEFAULT '',
-	"is_default" INTEGER NOT NULL DEFAULT 0,
-	"project_id" INTEGER NOT NULL REFERENCES "projects"("id") ON DELETE CASCADE,
-	"created_at" INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
-	"updated_at" INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL
+CREATE TABLE environments (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	name TEXT NOT NULL,
+	description TEXT,
+	env_var TEXT NOT NULL DEFAULT '',
+	is_default INTEGER NOT NULL DEFAULT 0,
+	project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+	created_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
+	updated_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL
 ) STRICT;
 
 -- Trigger Function

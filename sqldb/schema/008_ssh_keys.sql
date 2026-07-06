@@ -1,12 +1,12 @@
-CREATE TABLE "ssh_keys" (
-	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
-	"name" TEXT NOT NULL,
-	"description" TEXT,
-	"private_key" TEXT NOT NULL DEFAULT '',
-	"public_key" TEXT NOT NULL,
-	"last_used_at" INTEGER,
-	"created_at" INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
-	"updated_at" INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL
+CREATE TABLE ssh_keys (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	name TEXT NOT NULL,
+	description TEXT,
+	private_key TEXT NOT NULL DEFAULT '',
+	public_key TEXT NOT NULL,
+	last_used_at INTEGER,
+	created_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
+	updated_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL
 ) STRICT;
 
 -- Trigger Function
