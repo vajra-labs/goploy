@@ -3,7 +3,7 @@ package middle
 import (
 	"time"
 
-	"dokpanel/src/lib/core"
+	"dokpanel/src/errx"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/limiter"
@@ -36,12 +36,12 @@ func RateLimit(opts RateOption) fiber.Handler {
 			if code == "" {
 				code = "RATE_LIMIT_EXCEEDED"
 			}
-			return core.NewError(
+			return errx.NewError(
 				fiber.StatusTooManyRequests,
 				code,
 				msg,
-				core.WithMeta("limitReq", opts.Limit),
-				core.WithMeta("windowMs", opts.WindowMs.String()),
+				errx.WithMeta("limitReq", opts.Limit),
+				errx.WithMeta("windowMs", opts.WindowMs.String()),
 			)
 		},
 	})
