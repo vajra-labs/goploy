@@ -7,6 +7,7 @@ import (
 	"io"
 	"strings"
 	"sync"
+	"time"
 
 	"golang.org/x/crypto/ssh"
 )
@@ -46,7 +47,7 @@ func NewSSH(serverId string, cfg SSHConfig) error {
 			ssh.PublicKeys(signer),
 		},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-		Timeout:         99999,
+		Timeout:         10 * time.Second,
 	})
 	if err != nil {
 		msg := err.Error()
