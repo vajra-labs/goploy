@@ -17,6 +17,7 @@ func setupDirectories(p *docker.AppPaths) error {
 		p.SSH_PATH,
 		p.LOGS_PATH,
 		p.VOLUME_BACKUPS_PATH,
+		p.SCHEDULES_PATH,
 	}
 
 	for _, dir := range dirs {

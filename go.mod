@@ -3,6 +3,7 @@ module goploy
 go 1.26.3
 
 require (
+	github.com/BurntSushi/toml v1.6.0
 	github.com/MarceloPetrucio/go-scalar-api-reference v0.0.0-20240521013641-ce5d2efe0e06
 	github.com/danielgtaylor/huma/v2 v2.38.0
 	github.com/dustin/go-humanize v1.0.1
@@ -62,6 +63,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.43.0 // indirect
 	go.opentelemetry.io/otel/trace v1.43.0 // indirect
 	go.uber.org/dig v1.19.0 // indirect
+	go.uber.org/goleak v1.3.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.26.0 // indirect
 	golang.org/x/net v0.56.0 // indirect

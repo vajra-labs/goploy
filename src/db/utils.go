@@ -1,9 +1,12 @@
 package db
 
 import (
+	"crypto/rand"
 	"fmt"
-	"math/rand"
+	"math/big"
 	"strings"
+
+	"goploy/src/temp"
 )
 
 const alphabet = "abcdefghijklmnopqrstuvwxyz123456789"
@@ -24,19 +27,11 @@ var nouns = []string{
 }
 
 func randomFrom(list []string) string {
-	return list[rand.Intn(len(list))]
+	n, _ := rand.Int(rand.Reader, big.NewInt(int64(len(list))))
+	return list[n.Int64()]
 }
 
-func generatePassword(length int) string {
-	var b strings.Builder
-	for i := 0; i < length; i++ {
-		b.WriteByte(alphabet[rand.Intn(len(alphabet))])
-	}
-	return b.String()
-}
-
-// GenAppName generates:
-// type-verb-adjective-noun-abcdef
+// GenAppName generates: type-verb-adjective-noun-xxxxxx
 func GenAppName(appType string) string {
 	verb := strings.ReplaceAll(randomFrom(verbs), " ", "-")
 	adjective := strings.ReplaceAll(randomFrom(adjectives), " ", "-")
@@ -47,7 +42,7 @@ func GenAppName(appType string) string {
 		verb,
 		adjective,
 		noun,
-		generatePassword(6),
+		temp.GenerateHash(6),
 	)
 }
 
@@ -61,7 +56,7 @@ func CleanAppName(appName string) string {
 // BuildAppName follows same logic as TypeScript.
 func BuildAppName(appType string, baseAppName string) string {
 	if strings.TrimSpace(baseAppName) != "" {
-		return fmt.Sprintf("%s-%s", CleanAppName(baseAppName), generatePassword(6))
+		return fmt.Sprintf("%s-%s", CleanAppName(baseAppName), temp.GeneratePassword(6))
 	}
 	return GenAppName(appType)
 }

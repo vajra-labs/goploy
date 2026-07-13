@@ -19,6 +19,7 @@ type AppPaths struct {
 	APPLICATIONS_PATH       string // BASE/applications
 	COMPOSE_PATH            string // BASE/compose
 	REGISTRY_PATH           string // BASE/registry
+	SCHEDULES_PATH          string // BASE/schedules
 }
 
 // NewPaths builds AppPaths from config.
@@ -47,5 +48,6 @@ func providePaths(cfg *conf.Config) *AppPaths {
 		APPLICATIONS_PATH:       filepath.Join(base, "applications"),
 		COMPOSE_PATH:            filepath.Join(base, "compose"),
 		REGISTRY_PATH:           filepath.Join(base, "registry"),
+		SCHEDULES_PATH:          filepath.Join(base, "schedules"),
 	}
 }

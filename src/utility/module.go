@@ -8,4 +8,8 @@ import (
 )
 
 // Module bundles all utility sub-modules into a single fx module.
-var Module = fx.Module("lib", jwt.Module, docker.Module)
+var Module = fx.Module(
+	"utility",
+	jwt.Module,
+	docker.Module,
+)
