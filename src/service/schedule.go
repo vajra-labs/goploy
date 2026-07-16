@@ -12,6 +12,10 @@ type ScheduleService struct {
 	paths *docker.AppPaths
 }
 
-func NewSchedule(cfg *conf.Config, query *repos.Queries, paths *docker.AppPaths) *ScheduleService {
+func NewSchedule(
+	cfg *conf.Config,
+	query *repos.Queries,
+	paths *docker.AppPaths,
+) *ScheduleService {
 	return &ScheduleService{cfg: cfg, query: query, paths: paths}
 }

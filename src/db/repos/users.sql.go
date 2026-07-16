@@ -9,8 +9,77 @@ import (
 	"context"
 )
 
+const createUser = `-- name: CreateUser :one
+INSERT INTO users (
+	email, first_name, last_name,
+	password, is_owner, added_by
+)
+VALUES (?, ?, ?, ?, ?, ?)
+RETURNING id, email, last_name, first_name, avatar, is_owner, about_me, password, two_factor_enable, added_by, created_at, updated_at
+`
+
+type CreateUserParams struct {
+	Email     *string `json:"email"`
+	FirstName *string `json:"first_name"`
+	LastName  *string `json:"last_name"`
+	Password  string  `json:"password"`
+	IsOwner   *int64  `json:"is_owner"`
+	AddedBy   *int64  `json:"added_by"`
+}
+
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, createUser,
+		arg.Email,
+		arg.FirstName,
+		arg.LastName,
+		arg.Password,
+		arg.IsOwner,
+		arg.AddedBy,
+	)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.LastName,
+		&i.FirstName,
+		&i.Avatar,
+		&i.IsOwner,
+		&i.AboutMe,
+		&i.Password,
+		&i.TwoFactorEnable,
+		&i.AddedBy,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getUserByEmail = `-- name: GetUserByEmail :one
+SELECT id, email, last_name, first_name, avatar, is_owner, about_me, password, two_factor_enable, added_by, created_at, updated_at FROM users WHERE email = ? LIMIT 1
+`
+
+func (q *Queries) GetUserByEmail(ctx context.Context, email *string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserByEmail, email)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.LastName,
+		&i.FirstName,
+		&i.Avatar,
+		&i.IsOwner,
+		&i.AboutMe,
+		&i.Password,
+		&i.TwoFactorEnable,
+		&i.AddedBy,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, email, last_name, first_name, avatar, is_owner, about_me, password, is_email_verify, email_verify_at, two_factor_enable, is_registered, added_by, created_at, updated_at FROM users WHERE id = ?
+SELECT id, email, last_name, first_name, avatar, is_owner, about_me, password, two_factor_enable, added_by, created_at, updated_at FROM users WHERE id = ?
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id int64) (User, error) {
@@ -25,10 +94,123 @@ func (q *Queries) GetUserByID(ctx context.Context, id int64) (User, error) {
 		&i.IsOwner,
 		&i.AboutMe,
 		&i.Password,
-		&i.IsEmailVerify,
-		&i.EmailVerifyAt,
 		&i.TwoFactorEnable,
-		&i.IsRegistered,
+		&i.AddedBy,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const isOwnerPresent = `-- name: IsOwnerPresent :one
+SELECT COUNT(*) FROM users WHERE is_owner = 1 LIMIT 1
+`
+
+func (q *Queries) IsOwnerPresent(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, isOwnerPresent)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const transferOwnership = `-- name: TransferOwnership :exec
+UPDATE users SET is_owner = CASE
+    WHEN id = ? THEN 0
+    WHEN id = ? THEN 1
+END
+WHERE id IN (?, ?)
+`
+
+type TransferOwnershipParams struct {
+	ID   int64 `json:"id"`
+	ID_2 int64 `json:"id_2"`
+	ID_3 int64 `json:"id_3"`
+	ID_4 int64 `json:"id_4"`
+}
+
+func (q *Queries) TransferOwnership(ctx context.Context, arg TransferOwnershipParams) error {
+	_, err := q.db.ExecContext(ctx, transferOwnership,
+		arg.ID,
+		arg.ID_2,
+		arg.ID_3,
+		arg.ID_4,
+	)
+	return err
+}
+
+const updatePassword = `-- name: UpdatePassword :one
+UPDATE users
+SET password = ?
+WHERE id = ?
+RETURNING id, email, last_name, first_name, avatar, is_owner, about_me, password, two_factor_enable, added_by, created_at, updated_at
+`
+
+type UpdatePasswordParams struct {
+	Password string `json:"password"`
+	ID       int64  `json:"id"`
+}
+
+func (q *Queries) UpdatePassword(ctx context.Context, arg UpdatePasswordParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, updatePassword, arg.Password, arg.ID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.LastName,
+		&i.FirstName,
+		&i.Avatar,
+		&i.IsOwner,
+		&i.AboutMe,
+		&i.Password,
+		&i.TwoFactorEnable,
+		&i.AddedBy,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const updateUser = `-- name: UpdateUser :one
+UPDATE users
+SET
+	email      = ?,
+	first_name = ?,
+	last_name  = ?,
+	avatar     = ?,
+	about_me   = ?
+WHERE id = ?
+RETURNING id, email, last_name, first_name, avatar, is_owner, about_me, password, two_factor_enable, added_by, created_at, updated_at
+`
+
+type UpdateUserParams struct {
+	Email     *string `json:"email"`
+	FirstName *string `json:"first_name"`
+	LastName  *string `json:"last_name"`
+	Avatar    *string `json:"avatar"`
+	AboutMe   *string `json:"about_me"`
+	ID        int64   `json:"id"`
+}
+
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateUser,
+		arg.Email,
+		arg.FirstName,
+		arg.LastName,
+		arg.Avatar,
+		arg.AboutMe,
+		arg.ID,
+	)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.LastName,
+		&i.FirstName,
+		&i.Avatar,
+		&i.IsOwner,
+		&i.AboutMe,
+		&i.Password,
+		&i.TwoFactorEnable,
 		&i.AddedBy,
 		&i.CreatedAt,
 		&i.UpdatedAt,

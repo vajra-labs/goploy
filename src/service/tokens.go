@@ -12,34 +12,17 @@ import (
 	"goploy/src/types"
 )
 
-// createOptions holds options for creating a token.
-type createOptions struct {
-	userID    int64
-	tokenType types.TOKEN
-	exp       time.Duration
-	save      bool
-}
-
-// CreatedToken holds the signed token value and its max-age duration.
-type CreatedToken struct {
-	Token  jwt.Token
-	MaxAge time.Duration
-}
-
-// AuthTokens holds the access and refresh tokens returned on login/register.
 type AuthTokens struct {
-	Access  *CreatedToken
-	Refresh *CreatedToken
+	Access  *jwt.Token
+	Refresh *jwt.Token
 }
 
-// TokenService handles JWT creation, verification, and blacklisting.
 type TokenService struct {
 	cfg     *conf.Config
 	jwt     *jwt.JwtToken
 	queries *repos.Queries
 }
 
-// NewTokenService creates a new TokenService instance.
 func NewTokenService(
 	cfg *conf.Config,
 	jwtToken *jwt.JwtToken,
@@ -49,20 +32,24 @@ func NewTokenService(
 }
 
 // create generates a signed JWT and optionally persists it in the database.
-func (s *TokenService) Create(ctx context.Context, opts createOptions) (*CreatedToken, error) {
-	sub := strconv.FormatInt(opts.userID, 10)
-	payload := s.jwt.Payload(sub, opts.tokenType)
-
-	token, err := s.jwt.Sign(payload, opts.exp)
+func (s *TokenService) create(
+	ctx context.Context,
+	userID int64,
+	tokenType types.TOKEN,
+	exp time.Duration,
+	save bool,
+) (*jwt.Token, error) {
+	sub := strconv.FormatInt(userID, 10)
+	payload := s.jwt.Payload(sub, tokenType)
+	token, err := s.jwt.Sign(payload, exp)
 	if err != nil {
 		return nil, err
 	}
-
-	if opts.save {
-		expiredAt := time.Now().Add(opts.exp).Unix()
+	if save {
+		expiredAt := time.Now().Add(exp).Unix()
 		_, err = s.queries.CreateJwtToken(ctx, repos.CreateJwtTokenParams{
 			Jti:       payload.ID,
-			UserID:    opts.userID,
+			UserID:    userID,
 			ExpiredAt: &expiredAt,
 		})
 		if err != nil {
@@ -72,141 +59,149 @@ func (s *TokenService) Create(ctx context.Context, opts createOptions) (*Created
 			)
 		}
 	}
-
-	return &CreatedToken{Token: token, MaxAge: opts.exp}, nil
+	return &token, nil
 }
 
 // Generate creates a new access + refresh token pair for the given user.
 func (s *TokenService) Generate(
 	ctx context.Context,
 	userID int64,
-	role string,
 ) (*AuthTokens, error) {
-	access, err := s.Create(ctx, createOptions{
-		userID:    userID,
-		tokenType: types.ACC_TOKEN,
-		exp:       s.cfg.JWT_ACCESS_EXP,
-		save:      false,
-	})
+	access, err := s.create(
+		ctx,
+		userID,
+		types.ACC_TOKEN,
+		s.cfg.JWT_ACCESS_EXP,
+		false,
+	)
 	if err != nil {
 		return nil, err
 	}
-
-	refresh, err := s.Create(ctx, createOptions{
-		userID:    userID,
-		tokenType: types.REF_TOKEN,
-		exp:       s.cfg.JWT_REFRESH_EXP,
-		save:      true,
-	})
+	refresh, err := s.create(
+		ctx,
+		userID,
+		types.REF_TOKEN,
+		s.cfg.JWT_REFRESH_EXP,
+		true,
+	)
 	if err != nil {
 		return nil, err
 	}
-
 	return &AuthTokens{Access: access, Refresh: refresh}, nil
 }
 
 // Verify parses and validates a JWT string, and checks the token type.
-func (s *TokenService) Verify(tokenStr string, tokenType types.TOKEN) (*jwt.Payload, error) {
+func (s *TokenService) Verify(
+	tokenStr string,
+	tokenType types.TOKEN,
+) (*jwt.Payload, error) {
 	payload, err := s.jwt.Verify(tokenStr)
 	if err != nil {
 		return nil, err
 	}
 	if payload.TokenType != tokenType {
-		return nil, throw.UnauthorizedError("Token type is invalid", "INVALID_TOKEN_TYPE")
+		return nil, throw.UnauthorizedError(
+			"Token type is invalid",
+			"INVALID_TOKEN_TYPE",
+		)
 	}
 	return payload, nil
 }
 
-// AddBlacklist blacklists a refresh token. If many is true, all tokens for
-// that user are blacklisted (e.g. on logout-all / password change).
+// AddBlacklist blacklists a refresh token.
+// If many is true, all tokens for that user are blacklisted.
 func (s *TokenService) AddBlacklist(
 	ctx context.Context,
 	tokenStr string,
 	many bool,
-) (string, error) {
+) error {
 	payload, err := s.Verify(tokenStr, types.REF_TOKEN)
 	if err != nil {
-		return "", err
+		return err
 	}
-
 	record, err := s.queries.GetJwtTokenByJti(ctx, payload.ID)
 	if err != nil {
-		return "", throw.UnauthorizedError(
-			"Token not found", "TOKEN_NOT_FOUND",
+		return throw.UnauthorizedError(
+			"Token not found",
+			"TOKEN_NOT_FOUND",
 			throw.WithCause(err),
 		)
 	}
-
 	isBlacklisted := record.IsBlacklist != nil && *record.IsBlacklist == 1
 	if isBlacklisted {
-		return "", throw.BadRequestError(
+		return throw.BadRequestError(
 			"Token is already blacklisted",
 			"TOKEN_ALREADY_BLACKLISTED",
 		)
 	}
-
 	now := time.Now().Unix()
 	blacklisted := int64(1)
-
 	if many {
 		userID, parseErr := strconv.ParseInt(payload.Subject, 10, 64)
 		if parseErr != nil {
-			return "", throw.InternalServerError("Invalid subject in token", "INVALID_TOKEN_SUB")
+			return throw.InternalServerError(
+				"Invalid subject in token",
+				"INVALID_TOKEN_SUB",
+			)
 		}
-		err = s.queries.UpdateJwtTokensByUserID(ctx, repos.UpdateJwtTokensByUserIDParams{
-			IsBlacklist: &blacklisted,
-			BlacklistAt: &now,
-			UserID:      userID,
-		})
+		err = s.queries.UpdateJwtTokensByUserID(
+			ctx,
+			repos.UpdateJwtTokensByUserIDParams{
+				IsBlacklist: &blacklisted,
+				BlacklistAt: &now,
+				UserID:      userID,
+			},
+		)
 	} else {
-		err = s.queries.UpdateJwtTokenByJti(ctx, repos.UpdateJwtTokenByJtiParams{
-			IsBlacklist: &blacklisted,
-			BlacklistAt: &now,
-			Jti:         payload.ID,
-		})
+		err = s.queries.UpdateJwtTokenByJti(
+			ctx,
+			repos.UpdateJwtTokenByJtiParams{
+				IsBlacklist: &blacklisted,
+				BlacklistAt: &now,
+				Jti:         payload.ID,
+			},
+		)
 	}
 	if err != nil {
-		return "", throw.InternalServerError(
-			"Failed to blacklist token", "TOKEN_BLACKLIST_ERROR",
+		return throw.InternalServerError(
+			"Failed to blacklist token",
+			"TOKEN_BLACKLIST_ERROR",
 			throw.WithCause(err),
 		)
 	}
-
-	return payload.Subject, nil
+	return nil
 }
 
-// RefreshAccess issues a new access token using a valid, non-blacklisted refresh token.
+// RefreshAccess issues a new access token using a valid non-blacklisted refresh token.
 func (s *TokenService) RefreshAccess(
 	ctx context.Context,
 	refreshToken string,
-	role string,
-) (*CreatedToken, error) {
+) (*jwt.Token, error) {
 	payload, err := s.Verify(refreshToken, types.REF_TOKEN)
 	if err != nil {
 		return nil, err
 	}
-
 	notBlacklisted := int64(0)
-	_, err = s.queries.GetJwtTokenByJtiAndBlacklist(ctx, repos.GetJwtTokenByJtiAndBlacklistParams{
-		Jti:         payload.ID,
-		IsBlacklist: &notBlacklisted,
-	})
+	_, err = s.queries.GetJwtTokenByJtiAndBlacklist(
+		ctx,
+		repos.GetJwtTokenByJtiAndBlacklistParams{
+			Jti:         payload.ID,
+			IsBlacklist: &notBlacklisted,
+		},
+	)
 	if err != nil {
 		return nil, throw.UnauthorizedError(
-			"Refresh token is blacklisted or invalid", "TOKEN_BLACKLISTED",
+			"Refresh token is blacklisted or invalid",
+			"TOKEN_BLACKLISTED",
 			throw.WithCause(err),
 		)
 	}
-
 	userID, err := strconv.ParseInt(payload.Subject, 10, 64)
 	if err != nil {
-		return nil, throw.InternalServerError("Invalid subject in token", "INVALID_TOKEN_SUB")
+		return nil, throw.InternalServerError(
+			"Invalid subject in token",
+			"INVALID_TOKEN_SUB",
+		)
 	}
-
-	return s.Create(ctx, createOptions{
-		userID:    userID,
-		tokenType: types.ACC_TOKEN,
-		exp:       s.cfg.JWT_ACCESS_EXP,
-		save:      false,
-	})
+	return s.create(ctx, userID, types.ACC_TOKEN, s.cfg.JWT_ACCESS_EXP, false)
 }

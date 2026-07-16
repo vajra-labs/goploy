@@ -90,7 +90,7 @@ tasks:
     cmds:
       - go fmt ./...
       - gofumpt -l -w .
-      - golines -w .
+      - golines -m 80 -w .
 
   # Dependencies
   mod:deps:

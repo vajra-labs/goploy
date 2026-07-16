@@ -40,7 +40,8 @@ func invokeRouter(app *fiber.App, api huma.API, cfg *conf.Config) {
 
 		if renderErr != nil {
 			once = sync.Once{} // reset so next request retries
-			return ctx.Status(fiber.StatusInternalServerError).SendString(renderErr.Error())
+			return ctx.Status(fiber.StatusInternalServerError).
+				SendString(renderErr.Error())
 		}
 
 		ctx.Set("Content-Type", "text/html")

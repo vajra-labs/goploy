@@ -17,7 +17,11 @@ type Runner struct {
 	paths  *docker.AppPaths
 }
 
-func newRunner(cfg *conf.Config, dc *client.Client, paths *docker.AppPaths) *Runner {
+func newRunner(
+	cfg *conf.Config,
+	dc *client.Client,
+	paths *docker.AppPaths,
+) *Runner {
 	return &Runner{cfg: cfg, docker: dc, paths: paths}
 }
 

@@ -65,7 +65,11 @@ func provideOpenAPI(cfg *conf.Config) huma.API {
 	}
 
 	// Register custom HttpError in components/schemas
-	r.Components.Schemas.Schema(reflect.TypeOf(throw.HttpError{}), true, "HttpError")
+	r.Components.Schemas.Schema(
+		reflect.TypeOf(throw.HttpError{}),
+		true,
+		"HttpError",
+	)
 
 	return api
 }

@@ -36,7 +36,11 @@ func getNetworkName(cfg *conf.Config) string {
 }
 
 // SetupNetwork creates the overlay network if it doesn't exist.
-func setupNetwork(ctx context.Context, c *client.Client, cfg *conf.Config) error {
+func setupNetwork(
+	ctx context.Context,
+	c *client.Client,
+	cfg *conf.Config,
+) error {
 	netName := getNetworkName(cfg)
 
 	_, err := c.NetworkInspect(ctx, netName, client.NetworkInspectOptions{})
@@ -58,15 +62,27 @@ func setupNetwork(ctx context.Context, c *client.Client, cfg *conf.Config) error
 }
 
 // TeardownNetwork removes the overlay network.
-func teardownNetwork(ctx context.Context, c *client.Client, cfg *conf.Config) error {
+func teardownNetwork(
+	ctx context.Context,
+	c *client.Client,
+	cfg *conf.Config,
+) error {
 	netName := getNetworkName(cfg)
 
-	if _, err := c.NetworkInspect(ctx, netName, client.NetworkInspectOptions{}); err != nil {
+	if _, err := c.NetworkInspect(
+		ctx,
+		netName,
+		client.NetworkInspectOptions{},
+	); err != nil {
 		fmt.Printf("Network %q not found, skipping\n", netName)
 		return nil
 	}
 
-	if _, err := c.NetworkRemove(ctx, netName, client.NetworkRemoveOptions{}); err != nil {
+	if _, err := c.NetworkRemove(
+		ctx,
+		netName,
+		client.NetworkRemoveOptions{},
+	); err != nil {
 		return err
 	}
 
@@ -81,7 +97,10 @@ func teardownSwarm(ctx context.Context, c *client.Client) error {
 		return nil
 	}
 
-	if _, err := c.SwarmLeave(ctx, client.SwarmLeaveOptions{Force: true}); err != nil {
+	if _, err := c.SwarmLeave(
+		ctx,
+		client.SwarmLeaveOptions{Force: true},
+	); err != nil {
 		return err
 	}
 

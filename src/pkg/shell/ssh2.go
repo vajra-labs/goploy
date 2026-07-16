@@ -95,7 +95,10 @@ func (p *SSHPool) Get(ctx context.Context, serverId int64) (*SSHClient, error) {
 }
 
 // dial fetches credentials from DB and opens a fresh SSH connection.
-func (p *SSHPool) dial(ctx context.Context, serverId int64) (*ssh.Client, error) {
+func (p *SSHPool) dial(
+	ctx context.Context,
+	serverId int64,
+) (*ssh.Client, error) {
 	serverIdStr := fmt.Sprint(serverId)
 
 	cfg, err := p.query.GetServerSSHCredentials(ctx, serverId)

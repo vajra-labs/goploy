@@ -966,14 +966,11 @@ type User struct {
 	Email           *string `json:"email"`
 	LastName        *string `json:"last_name"`
 	FirstName       *string `json:"first_name"`
-	Avatar          string  `json:"avatar"`
+	Avatar          *string `json:"avatar"`
 	IsOwner         *int64  `json:"is_owner"`
 	AboutMe         *string `json:"about_me"`
 	Password        string  `json:"password"`
-	IsEmailVerify   *int64  `json:"is_email_verify"`
-	EmailVerifyAt   *int64  `json:"email_verify_at"`
 	TwoFactorEnable *int64  `json:"two_factor_enable"`
-	IsRegistered    int64   `json:"is_registered"`
 	AddedBy         *int64  `json:"added_by"`
 	CreatedAt       int64   `json:"created_at"`
 	UpdatedAt       int64   `json:"updated_at"`

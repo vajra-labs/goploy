@@ -85,7 +85,10 @@ func FetchTemplatesList(ctx context.Context) ([]TemplateMetadata, error) {
 }
 
 // FetchTemplateFiles fetches template.toml + docker-compose.yml from CDN concurrently
-func FetchTemplateFiles(ctx context.Context, templateID string) (*TemplateFiles, error) {
+func FetchTemplateFiles(
+	ctx context.Context,
+	templateID string,
+) (*TemplateFiles, error) {
 	type result struct {
 		data []byte
 		err  error
@@ -94,8 +97,16 @@ func FetchTemplateFiles(ctx context.Context, templateID string) (*TemplateFiles,
 	tomlCh := make(chan result, 1)
 	composeCh := make(chan result, 1)
 
-	tomlURL := fmt.Sprintf("%s/blueprints/%s/template.toml", baseURL, templateID)
-	composeURL := fmt.Sprintf("%s/blueprints/%s/docker-compose.yml", baseURL, templateID)
+	tomlURL := fmt.Sprintf(
+		"%s/blueprints/%s/template.toml",
+		baseURL,
+		templateID,
+	)
+	composeURL := fmt.Sprintf(
+		"%s/blueprints/%s/docker-compose.yml",
+		baseURL,
+		templateID,
+	)
 
 	go func() {
 		data, err := fetchBytes(ctx, tomlURL)
@@ -113,7 +124,10 @@ func FetchTemplateFiles(ctx context.Context, templateID string) (*TemplateFiles,
 		return nil, fmt.Errorf("fetch template.toml: %w", tomlResult.err)
 	}
 	if composeResult.err != nil {
-		return nil, fmt.Errorf("fetch docker-compose.yml: %w", composeResult.err)
+		return nil, fmt.Errorf(
+			"fetch docker-compose.yml: %w",
+			composeResult.err,
+		)
 	}
 
 	// Parse TOML config

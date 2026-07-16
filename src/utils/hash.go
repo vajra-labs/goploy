@@ -100,7 +100,10 @@ func GenerateJWT(secret string, payload map[string]any, length int) string {
 
 // HashPassword hashes a plain-text password using bcrypt.
 func HashPassword(password string) (string, error) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	hash, err := bcrypt.GenerateFromPassword(
+		[]byte(password),
+		bcrypt.DefaultCost,
+	)
 	if err != nil {
 		return "", err
 	}

@@ -39,7 +39,9 @@ func newClient(cfg *conf.Config) *client.Client {
 			fsPath = socketPath[7:]
 		}
 		if _, err := os.Stat(fsPath); os.IsNotExist(err) {
-			log.Debug().Str("socket", fsPath).Msg("Docker socket not found, skipping")
+			log.Debug().
+				Str("socket", fsPath).
+				Msg("Docker socket not found, skipping")
 			continue
 		}
 		opts := []client.Opt{client.WithHost(socketPath)}
@@ -71,8 +73,14 @@ func getCandidates(cfg *conf.Config) []string {
 	if home, err := os.UserHomeDir(); err == nil {
 		candidates = append(
 			candidates,
-			fmt.Sprintf("unix://%s/.rd/docker.sock", home),             // Rancher Desktop
-			fmt.Sprintf("unix://%s/.colima/default/docker.sock", home), // Colima
+			fmt.Sprintf(
+				"unix://%s/.rd/docker.sock",
+				home,
+			), // Rancher Desktop
+			fmt.Sprintf(
+				"unix://%s/.colima/default/docker.sock",
+				home,
+			), // Colima
 		)
 	}
 	// Priority 4: Standard Docker socket (fallback)

@@ -95,7 +95,11 @@ type ExecResult struct {
 //
 // To enable shell syntax, specify a shell using WithShell.
 // To stream output in real-time, specify a callback using WithOnData.
-func Exec(ctx context.Context, command string, options ...ExecOption) <-chan ExecResult {
+func Exec(
+	ctx context.Context,
+	command string,
+	options ...ExecOption,
+) <-chan ExecResult {
 	ch := make(chan ExecResult, 1)
 
 	opts := &ExecOptions{}
@@ -181,7 +185,11 @@ func execStream(cmd *exec.Cmd, command string, onData func(string)) ExecResult {
 }
 
 // buildCmd constructs an *exec.Cmd from a command string and options.
-func buildCmd(ctx context.Context, command string, opts *ExecOptions) *exec.Cmd {
+func buildCmd(
+	ctx context.Context,
+	command string,
+	opts *ExecOptions,
+) *exec.Cmd {
 	var cmd *exec.Cmd
 	if opts.Shell == "" {
 		// Direct binary — no shell, faster and safer

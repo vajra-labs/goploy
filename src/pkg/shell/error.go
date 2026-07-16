@@ -61,7 +61,11 @@ func newExecError(command, stdout, stderr string, err error) *ExecError {
 	return execErr
 }
 
-func newSSHExecError(command, stdout, stderr string, err error, serverId string) *ExecError {
+func newSSHExecError(
+	command, stdout, stderr string,
+	err error,
+	serverId string,
+) *ExecError {
 	execErr := &ExecError{
 		Message:  fmt.Sprintf("Remote command execution failed: %v", err),
 		Command:  command,

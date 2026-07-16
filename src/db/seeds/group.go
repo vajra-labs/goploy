@@ -53,7 +53,13 @@ func syncSystemGroups(
 			}
 			log.Info().Str("Group", groupName).Msg("Seed: created system group")
 		}
-		if err := syncSingleGroupPolicies(ctx, qtx, group, groupStatements, policyIDs); err != nil {
+		if err := syncSingleGroupPolicies(
+			ctx,
+			qtx,
+			group,
+			groupStatements,
+			policyIDs,
+		); err != nil {
 			_ = tx.Rollback()
 			log.Fatal().
 				Err(err).

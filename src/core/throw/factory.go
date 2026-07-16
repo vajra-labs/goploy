@@ -3,7 +3,9 @@ package throw
 import "github.com/gofiber/fiber/v3"
 
 // Create Method
-func create(status int) func(message string, code string, opts ...Option) *HttpError {
+func create(
+	status int,
+) func(message string, code string, opts ...Option) *HttpError {
 	return func(message string, code string, opts ...Option) *HttpError {
 		return NewError(status, code, message, opts...)
 	}

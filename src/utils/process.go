@@ -43,7 +43,10 @@ func processVariables(t *CompleteTemplate, schema Schema) map[string]string {
 	for key, value := range t.Variables {
 		switch {
 		case value == "${domain}":
-			variables[key] = GenerateRandomDomain(schema.ServerIP, schema.ProjectName)
+			variables[key] = GenerateRandomDomain(
+				schema.ServerIP,
+				schema.ProjectName,
+			)
 		case value == "${base64}":
 			variables[key] = GenerateBase64Str(32)
 		case strings.HasPrefix(value, "${base64:"):
@@ -76,7 +79,11 @@ func processVariables(t *CompleteTemplate, schema Schema) map[string]string {
 var placeholderRe = regexp.MustCompile(`\$\{([^}]+)\}`)
 
 // processValue replaces all ${...} in a string with resolved values.
-func processValue(value string, variables map[string]string, schema Schema) string {
+func processValue(
+	value string,
+	variables map[string]string,
+	schema Schema,
+) string {
 	return placeholderRe.ReplaceAllStringFunc(value, func(match string) string {
 		inner := match[2 : len(match)-1] // strip ${ and }
 		return resolvePlaceholder(inner, variables, schema)
@@ -84,7 +91,11 @@ func processValue(value string, variables map[string]string, schema Schema) stri
 }
 
 // resolvePlaceholder maps a placeholder name to its generated/resolved value.
-func resolvePlaceholder(varName string, variables map[string]string, schema Schema) string {
+func resolvePlaceholder(
+	varName string,
+	variables map[string]string,
+	schema Schema,
+) string {
 	switch {
 	case varName == "domain":
 		return GenerateRandomDomain(schema.ServerIP, schema.ProjectName)
@@ -117,14 +128,20 @@ func resolvePlaceholder(varName string, variables map[string]string, schema Sche
 		return strconv.FormatInt(time.Now().Unix(), 10)
 
 	case strings.HasPrefix(varName, "timestampms:"):
-		t, err := time.Parse(time.RFC3339, strings.TrimPrefix(varName, "timestampms:"))
+		t, err := time.Parse(
+			time.RFC3339,
+			strings.TrimPrefix(varName, "timestampms:"),
+		)
 		if err != nil {
 			return "${" + varName + "}"
 		}
 		return strconv.FormatInt(t.UnixMilli(), 10)
 
 	case strings.HasPrefix(varName, "timestamps:"):
-		t, err := time.Parse(time.RFC3339, strings.TrimPrefix(varName, "timestamps:"))
+		t, err := time.Parse(
+			time.RFC3339,
+			strings.TrimPrefix(varName, "timestamps:"),
+		)
 		if err != nil {
 			return "${" + varName + "}"
 		}
@@ -217,7 +234,11 @@ func processDomains(
 }
 
 // processEnvVars resolves env var values with placeholder substitution.
-func processEnvVars(t *CompleteTemplate, variables map[string]string, schema Schema) []string {
+func processEnvVars(
+	t *CompleteTemplate,
+	variables map[string]string,
+	schema Schema,
+) []string {
 	if len(t.Config.Env) == 0 {
 		return []string{}
 	}
@@ -240,7 +261,11 @@ func processEnvVars(t *CompleteTemplate, variables map[string]string, schema Sch
 }
 
 // processMounts resolves mount filePath and content placeholders.
-func processMounts(t *CompleteTemplate, variables map[string]string, schema Schema) []MountConfig {
+func processMounts(
+	t *CompleteTemplate,
+	variables map[string]string,
+	schema Schema,
+) []MountConfig {
 	if len(t.Config.Mounts) == 0 {
 		return []MountConfig{}
 	}
@@ -274,11 +299,34 @@ func extractInt(s, pattern string, defaultVal int) int {
 
 // generateRandomUsername returns a simple random username (replaces faker).
 func generateRandomUsername() string {
-	adjectives := []string{"fast", "cool", "happy", "bright", "calm", "bold", "swift", "keen"}
-	nouns := []string{"tiger", "eagle", "wolf", "panda", "hawk", "lion", "bear", "fox"}
+	adjectives := []string{
+		"fast",
+		"cool",
+		"happy",
+		"bright",
+		"calm",
+		"bold",
+		"swift",
+		"keen",
+	}
+	nouns := []string{
+		"tiger",
+		"eagle",
+		"wolf",
+		"panda",
+		"hawk",
+		"lion",
+		"bear",
+		"fox",
+	}
 	n1, _ := rand.Int(rand.Reader, big.NewInt(int64(len(adjectives))))
 	n2, _ := rand.Int(rand.Reader, big.NewInt(int64(len(nouns))))
-	return fmt.Sprintf("%s_%s_%s", adjectives[n1.Int64()], nouns[n2.Int64()], GenerateHash(4))
+	return fmt.Sprintf(
+		"%s_%s_%s",
+		adjectives[n1.Int64()],
+		nouns[n2.Int64()],
+		GenerateHash(4),
+	)
 }
 
 // generateRandomEmail returns a simple random email.

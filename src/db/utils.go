@@ -54,7 +54,11 @@ func CleanAppName(appName string) string {
 // BuildAppName follows same logic as TypeScript.
 func BuildAppName(appType string, baseAppName string) string {
 	if strings.TrimSpace(baseAppName) != "" {
-		return fmt.Sprintf("%s-%s", CleanAppName(baseAppName), utils.GeneratePassword(6))
+		return fmt.Sprintf(
+			"%s-%s",
+			CleanAppName(baseAppName),
+			utils.GeneratePassword(6),
+		)
 	}
 	return GenAppName(appType)
 }

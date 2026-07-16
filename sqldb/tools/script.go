@@ -22,7 +22,9 @@ const migrateDir = "sqldb/migrate"
 //
 // -- create trigger "..."
 // CREATE TRIGGER ... END;
-var triggerRe = regexp.MustCompile(`(?is)(-- create trigger[^\n]*\n)(CREATE TRIGGER\b[\s\S]+?END;)`)
+var triggerRe = regexp.MustCompile(
+	`(?is)(-- create trigger[^\n]*\n)(CREATE TRIGGER\b[\s\S]+?END;)`,
+)
 
 func main() {
 	if err := run(); err != nil {

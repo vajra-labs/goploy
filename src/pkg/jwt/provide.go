@@ -58,7 +58,8 @@ func (j *JwtToken) Sign(payload Payload, exp time.Duration) (Token, error) {
 	payload.IssuedAt = jwt.NewNumericDate(now)
 	payload.ExpiresAt = jwt.NewNumericDate(expires)
 
-	signed, err := jwt.NewWithClaims(jwt.SigningMethodHS256, payload).SignedString(j.secret)
+	signed, err := jwt.NewWithClaims(jwt.SigningMethodHS256, payload).
+		SignedString(j.secret)
 	if err != nil {
 		return Token{}, throw.InternalServerError(
 			"Failed to sign JWT token", "JWT_SIGN_ERROR",
@@ -73,12 +74,22 @@ func (j *JwtToken) Sign(payload Payload, exp time.Duration) (Token, error) {
 func (j *JwtToken) Verify(tokenStr string) (*Payload, error) {
 	var payload Payload
 
-	token, err := jwt.ParseWithClaims(tokenStr, &payload, func(t *jwt.Token) (any, error) {
-		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, throw.UnauthorizedError("Unexpected signing method", "INVALID_JWT")
-		}
-		return j.secret, nil
-	}, jwt.WithIssuer(iss), jwt.WithAudience(aud), jwt.WithExpirationRequired())
+	token, err := jwt.ParseWithClaims(
+		tokenStr,
+		&payload,
+		func(t *jwt.Token) (any, error) {
+			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, throw.UnauthorizedError(
+					"Unexpected signing method",
+					"INVALID_JWT",
+				)
+			}
+			return j.secret, nil
+		},
+		jwt.WithIssuer(iss),
+		jwt.WithAudience(aud),
+		jwt.WithExpirationRequired(),
+	)
 	if err != nil {
 		if errors.Is(err, jwt.ErrTokenExpired) {
 			return nil, throw.UnauthorizedError(

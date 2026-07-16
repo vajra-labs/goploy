@@ -39,10 +39,15 @@ func provideFiber(cfg *conf.Config) *fiber.App {
 	}))
 	// CORS
 	app.Use(cors.New(cors.Config{
-		MaxAge:           86400,
-		AllowOrigins:     []string{cfg.CORS_ORIGIN},
-		AllowMethods:     []string{"GET", "POST", "DELETE", "OPTIONS", "PATCH"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		MaxAge:       86400,
+		AllowOrigins: []string{cfg.CORS_ORIGIN},
+		AllowMethods: []string{"GET", "POST", "DELETE", "OPTIONS", "PATCH"},
+		AllowHeaders: []string{
+			"Origin",
+			"Content-Type",
+			"Accept",
+			"Authorization",
+		},
 		AllowCredentials: true,
 		ExposeHeaders:    []string{"Content-Length"},
 	}))
