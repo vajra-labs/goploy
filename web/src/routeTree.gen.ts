@@ -9,24 +9,34 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/_root'
+import { Route as appRouteImport } from './routes/_app'
+import { Route as authAuthRouteImport } from './routes/auth/_auth'
 import { Route as indexRouteImport } from './routes/index'
 import { Route as authSinginRouteImport } from './routes/auth/singin'
 import { Route as authSingupRouteImport } from './routes/auth/singup'
 
+const appRoute = appRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authAuthRoute = authAuthRouteImport.update({
+  id: '/_auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const indexRoute = indexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => appRoute,
 } as any)
 const authSinginRoute = authSinginRouteImport.update({
   id: '/singin',
   path: '/singin',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => authAuthRoute,
 } as any)
 const authSingupRoute = authSingupRouteImport.update({
   id: '/singup',
   path: '/singup',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => authAuthRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -41,54 +51,98 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof indexRoute
-  '/singin': typeof authSinginRoute
-  '/singup': typeof authSingupRoute
+  '/_app': typeof appRouteWithChildren
+  '/_auth': typeof authAuthRouteWithChildren
+  '/_app/': typeof indexRoute
+  '/_auth/singin': typeof authSinginRoute
+  '/_auth/singup': typeof authSingupRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths: '/' | '/singin' | '/singup'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/singin' | '/singup'
-  id: '__root__' | '/' | '/singin' | '/singup'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/_auth'
+    | '/_app/'
+    | '/_auth/singin'
+    | '/_auth/singup'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  indexRoute: typeof indexRoute
-  authSinginRoute: typeof authSinginRoute
-  authSingupRoute: typeof authSingupRoute
+  appRoute: typeof appRouteWithChildren
+  authAuthRoute: typeof authAuthRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof appRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof authAuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/': {
+      id: '/_app/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof indexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof appRoute
     }
-    '/singin': {
-      id: '/singin'
+    '/_auth/singin': {
+      id: '/_auth/singin'
       path: '/singin'
       fullPath: '/singin'
       preLoaderRoute: typeof authSinginRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof authAuthRoute
     }
-    '/singup': {
-      id: '/singup'
+    '/_auth/singup': {
+      id: '/_auth/singup'
       path: '/singup'
       fullPath: '/singup'
       preLoaderRoute: typeof authSingupRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof authAuthRoute
     }
   }
 }
 
-const rootRouteChildren: RootRouteChildren = {
+interface appRouteChildren {
+  indexRoute: typeof indexRoute
+}
+
+const appRouteChildren: appRouteChildren = {
   indexRoute: indexRoute,
+}
+
+const appRouteWithChildren = appRoute._addFileChildren(appRouteChildren)
+
+interface authAuthRouteChildren {
+  authSinginRoute: typeof authSinginRoute
+  authSingupRoute: typeof authSingupRoute
+}
+
+const authAuthRouteChildren: authAuthRouteChildren = {
   authSinginRoute: authSinginRoute,
   authSingupRoute: authSingupRoute,
+}
+
+const authAuthRouteWithChildren = authAuthRoute._addFileChildren(
+  authAuthRouteChildren,
+)
+
+const rootRouteChildren: RootRouteChildren = {
+  appRoute: appRouteWithChildren,
+  authAuthRoute: authAuthRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

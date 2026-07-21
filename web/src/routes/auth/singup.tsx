@@ -1,6 +1,6 @@
 import {createFileRoute} from '@tanstack/react-router';
 
-export const Route = createFileRoute('/singup')({
+export const Route = createFileRoute('/_auth/singup')({
 	component: RouteComponent,
 });
 

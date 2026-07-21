@@ -1,7 +1,7 @@
 import {defineConfig} from 'oxfmt';
 
 export default defineConfig({
-	printWidth: 80,
+	printWidth: 75,
 	trailingComma: 'all',
 	singleQuote: true,
 	arrowParens: 'avoid',
