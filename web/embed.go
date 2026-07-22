@@ -8,7 +8,7 @@ import (
 	"github.com/gofiber/fiber/v3/middleware/static"
 )
 
-//go:embed dist/*
+//go:embed all:dist
 var assets embed.FS
 
 // ServeSPA serves the embedded React SPA with client-side routing fallback.

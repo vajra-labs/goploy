@@ -24,8 +24,13 @@ tasks:
 
   # Development
   setup:
-    desc: One-time dev setup (Swarm, Traefik, ...etc)
-    cmd: go run ./cmd/setup/main.go
+    desc: One-time dev setup (Swarm, Traefik, Git hooks, ...etc)
+    preconditions:
+      - sh: command -v lefthook
+        msg: "Lefthook not found. Install with: go install github.com/evilmartians/lefthook/v2"
+    cmds:
+      - go run ./cmd/setup/main.go
+      - lefthook install
 
   teardown:
     desc: Revert dev setup (remove Traefik, ...etc)
@@ -147,7 +152,7 @@ tasks:
     dir: sqldb
     cmd: sqlc generate
 
-  # Web Dashboard (React Router + Bun)
+  # Web Dashboard (Tanstack Router + Bun)
   web:dev:
     desc: Start web dashboard dev server
     dir: web

@@ -1,0 +1,25 @@
+# lefthook.yml
+# https://github.com/evilmartians/lefthook
+
+pre-commit:
+  parallel: true
+  commands:
+    web-lint:
+      glob: "web/src/**/*.{ts,tsx,js,json}"
+      run: cd web && bun run check:oxc
+
+    web-format:
+      glob: "web/src/**/*.{ts,tsx,js,json}"
+      run: cd web && bun run format
+
+    web-tsc:
+      glob: "web/src/**/*.{ts,tsx,js,json}"
+      run: cd web && bun run check:tsc
+
+    go-format:
+      glob: "**/*.go"
+      run: task code:format
+
+    go-lint:
+      glob: "**/*.go"
+      run: task code:lint

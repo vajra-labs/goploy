@@ -7,7 +7,7 @@ interface Props {
 
 export const Logo = ({
 	className = 'size-20',
-	logoUrl = '/favicon.svg',
+	logoUrl = '/gokploy.png',
 }: Props) => {
 	return (
 		<img

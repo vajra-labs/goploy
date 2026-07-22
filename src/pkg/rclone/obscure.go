@@ -29,7 +29,7 @@ func Obscure(plaintext string) (string, error) {
 	}
 
 	// Generate a random IV of size 16 (AES block size)
-	iv := make([]byte, aes.BlockSize)
+	iv := make([]byte, aes.BlockSize, aes.BlockSize+len(plaintextBytes))
 	if _, err := rand.Read(iv); err != nil {
 		return "", err
 	}

@@ -131,7 +131,8 @@ func ValidateServer(
 	serverId int64,
 ) (*ServerValidationResult, error) {
 	// Construct the combined bash validation command
-	bashCommand := fmt.Sprintf(`
+	bashCommand := fmt.Sprintf(
+		`
 command_exists() {
   command -v "$@" > /dev/null 2>&1
 }
@@ -187,7 +188,11 @@ echo "{\"docker\": {\"version\": \"$dockerVersion\", \"enabled\": $dockerEnabled
 	stdout := strings.TrimSpace(res.Stdout)
 	var result ServerValidationResult
 	if err := json.Unmarshal([]byte(stdout), &result); err != nil {
-		return nil, fmt.Errorf("failed to parse server validation output %q: %w", stdout, err)
+		return nil, fmt.Errorf(
+			"failed to parse server validation output %q: %w",
+			stdout,
+			err,
+		)
 	}
 	return &result, nil
 }

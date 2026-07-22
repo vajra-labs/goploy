@@ -13,6 +13,7 @@ const config = defineConfig({
 		tanstackRouter({
 			target: 'react',
 			autoCodeSplitting: true,
+			routesDirectory: './src/pages',
 			virtualRouteConfig: routes,
 		}),
 		viteReact(),

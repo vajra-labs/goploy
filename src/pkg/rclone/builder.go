@@ -27,7 +27,7 @@ type Builder struct {
 	connectTimeout  string  // --contimeout: connection timeout e.g. "10s"
 	retryDelay      string  // --retry-delay: delay between retries e.g. "10s"
 
-	// Safety & Behaviour
+	// Safety & Behavior
 	dryRun         bool // --dry-run: show what would be done without doing it
 	checkFirst     bool // --check-first: check all files before starting transfers
 	ignoreErrors   bool // --ignore-errors: delete even if there are errors

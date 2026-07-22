@@ -9,7 +9,7 @@ export default defineConfig({
 	bracketSameLine: true,
 	useTabs: true,
 	sortTailwindcss: {
-		stylesheet: './src/index.css',
+		stylesheet: './src/styles/index.css',
 		functions: ['clsx', 'cn'],
 		preserveWhitespace: true,
 	},

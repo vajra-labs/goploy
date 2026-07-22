@@ -20,6 +20,7 @@ type LocalTarget struct {
 	Path string
 }
 
+//nolint:unparam
 func (t *LocalTarget) compile(_ string) (string, map[string]string) {
 	return t.Path, nil
 }
