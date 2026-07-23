@@ -37,3 +37,9 @@ linters:
         linters:
           - unused
           - unparam
+      - path: web/node_modules/
+        linters:
+          - govet
+          - errcheck
+          - unused
+          - staticcheck

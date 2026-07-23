@@ -1,10 +1,19 @@
+import {Header, Wrapper} from '#auth/widgets';
+import {SignUpForm} from '#auth/forms/signup.form';
 import {createFileRoute} from '@tanstack/react-router';
-import {SignUpForm} from '#/feature/auth/signup-form';
 
 export const Route = createFileRoute('/_auth/singup')({
 	component: RouteComponent,
 });
 
 function RouteComponent() {
-	return <SignUpForm />;
+	return (
+		<Wrapper>
+			<Header
+				title="Create an account"
+				subtitle="Start managing your servers and deploying with GoPloy"
+			/>
+			<SignUpForm />
+		</Wrapper>
+	);
 }

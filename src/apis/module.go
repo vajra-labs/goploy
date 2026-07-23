@@ -14,6 +14,7 @@ var Module = fx.Module(
 	fx.Provide(
 		handler.NewHealthHandler,
 		handler.NewAuthHandler,
+		handler.NewUserHandler,
 		handler.NewSshKeyHandler,
 		handler.NewGitProviderHandler,
 		handler.NewGithubHandler,
@@ -25,6 +26,7 @@ var Module = fx.Module(
 	fx.Invoke(
 		docs.HealthOpenApi,
 		docs.AuthOpenApi,
+		docs.UserOpenApi,
 		docs.SshKeyOpenApi,
 		docs.GitProviderOpenApi,
 		docs.GithubOpenApi,

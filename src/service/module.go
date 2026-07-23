@@ -12,6 +12,7 @@ var Module = fx.Module(
 	fx.Provide(
 		NewAuthService,
 		NewTokenService,
+		NewUserService,
 		NewSshKeyService,
 		NewDockerService,
 		provider.NewGitProviderService,

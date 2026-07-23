@@ -16,6 +16,7 @@ type RouterParams struct {
 	App                *fiber.App
 	HealthHandler      *handler.HealthHandler
 	AuthHandler        *handler.AuthHandler
+	UserHandler        *handler.UserHandler
 	SshKeyHandler      *handler.SshKeyHandler
 	GitProviderHandler *handler.GitProviderHandler
 	GithubHandler      *handler.GithubHandler
@@ -29,6 +30,7 @@ type RouterParams struct {
 func Register(p RouterParams) {
 	api := p.App.Group("/api")
 	router.AuthRouter(api, p.AuthHandler)
+	router.UserRouter(api, p.UserHandler, p.Guard)
 	router.HealthRouter(api, p.HealthHandler)
 	router.SshKeyRouter(api, p.SshKeyHandler, p.Guard)
 	router.GitProviderRouter(api, p.GitProviderHandler, p.Guard)
