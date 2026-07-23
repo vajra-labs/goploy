@@ -63,6 +63,8 @@ func main() {
 		apis.Module,
 		pkg.Module,
 		service.Module,
+		// ServeSPA must come after apis.Module so API routes are registered first.
+		// The SPA fallback will then only catch non-API routes.
 		fx.Invoke(web.ServeSPA),
 		fx.Invoke(StartServer),
 	)
